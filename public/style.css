@@ -1,0 +1,157 @@
+html {
+	margin: 0;
+	padding: 0;
+	}
+body{
+	border: 0px;
+	margin: 0px;
+    padding: 0px;
+    font-family: Lucida;
+    background-color: white;
+
+}
+
+
+#localVideo {
+	/*position: relative;*/
+
+	width: 650pt;
+	/*height: 97%;*/
+	margin-left: 280pt;
+	}
+
+#remoteVideo {
+	/*position: relative;*/
+
+	/*width: 700pt;*/
+	/*height: 97%;*/
+	margin-top: -40pt;
+	margin-left: 240pt;
+	}
+
+
+#home {
+	border: 0px;
+    padding: 0px;
+
+}
+
+
+.image {
+	width: 108px;
+	height: 126px;
+	opacity: 0.3;
+}
+
+.image:hover {
+	opacity: 1;
+	transition-duration: 1s;
+
+}
+
+/*#button {
+	width: 108px;
+	height: 126px;
+}
+*/
+
+a:link{
+	color: white;
+	text-decoration: none;
+
+}
+a:active {
+    color: white;
+    text-decoration: none;
+}
+a:hover{
+	color: #19CDFF !important;
+	text-decoration: none;
+	}
+a:visited{
+	color: white;
+	text-decoration: none;
+}
+
+
+.logo {
+	position: absolute;
+	margin-left: 720pt;
+	margin-top: 10pt;
+	/*margin-bottom: 10pt;*/
+	width: 170pt;
+	/*height: 20pt;*/
+}
+
+.buttons{
+	width: 300pt;
+	margin-top: -70pt;
+	margin-left: 15pt;
+}
+
+
+.movement{
+	position: absolute;
+	margin-left: 10pt;
+	margin-top: -400pt;
+	width: 300px;
+
+}
+
+#turn-up {
+	/*position: absolute;*/
+	/*margin-left: 2%;
+	margin-top: 3%;*/
+	width: 100pt;
+}
+
+#turn-left {
+	width: 100pt;
+	/*position: absolute;*/
+	margin-left: 5pt;
+	/*margin-top: 3%;*/
+
+}
+}
+
+
+#turn-right {
+	width: 100pt;
+	/*position: absolute;*/
+/*	margin-left: 2%;
+	margin-top: 3%;*/
+}
+
+#turn-down {
+	width: 100pt;
+/*	position: absolute;*/
+	margin-left: 5pt;
+	/*margin-top: 4%;*/
+}
+
+}
+
+#startButton {
+	width: 100pt;
+	/*position: absolute;*/
+	/*background: red;*/
+
+	/*margin-left: 60%;*/
+	/*margin-top: -50pt;*/
+}
+
+#hangupButton {
+	width: 100pt;
+	/*position: absolute;*/
+	/*background: green;*/
+
+	/*margin-left: 60%;
+	margin-top: 40%;*/
+}
+
+#callButton {
+	opacity: 0;
+	/*position: absolute;
+	margin-left: 70%;
+	margin-top: 40%;*/
+}

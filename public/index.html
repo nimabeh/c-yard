@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>C-YARD</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+      <link href="style.css" type="text/css" rel="stylesheet">
+
+    <style type="text/css">
+      button { font-size: 1.2em; 
+           font-weight: 100;
+           font-family: Lucida Fax;
+           width: 100px; 
+           height: 100px; 
+           border-radius: 50%; 
+           background: white;
+          }
+    </style>
+
+
+  <script src='//149.31.206.141:3000/socket.io/socket.io.js'></script>
+  
+   <script src='js/lib/adapter.js'></script>
+
+
+
+  </head>
+
+  
+  <body>
+
+    <div>
+    
+    <a href="index.html"><img style="border:0;" src="img/c-yard.png" class="logo"><a>
+    </div>
+
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay muted></video>
+
+ <div class="buttons">
+    <!-- <button id="startButton">Start</button> -->
+    <img style="border:0;" src="img/start.png" id="startButton">
+
+    <!-- <button id="hangupButton">Get</button> -->
+  <img style="border:0;" src="img/get.png" id="hangupButton">
+
+    <button id="callButton">Call</button>
+  </div>
+  
+
+<script>
+var localStream, localPeerConnection, remotePeerConnection;
+
+var localVideo = document.getElementById("localVideo");
+var remoteVideo = document.getElementById("remoteVideo");
+
+var startButton = document.getElementById("startButton");
+var callButton = document.getElementById("callButton");
+var hangupButton = document.getElementById("hangupButton");
+startButton.disabled = false;
+callButton.disabled = true;
+hangupButton.disabled = true;
+startButton.onclick = start;
+callButton.onclick = call;
+hangupButton.onclick = hangup;
+
+function trace(text) {
+  console.log((performance.now() / 1000).toFixed(3) + ": " + text);
+}
+
+function gotStream(stream){
+  trace("Received local stream");
+  localVideo.src = URL.createObjectURL(stream);
+  localStream = stream;
+  callButton.disabled = false;
+}
+
+function start() {
+  trace("Requesting local stream");
+  startButton.disabled = true;
+  getUserMedia({audio:true, video:true}, gotStream,
+    function(error) {
+      trace("getUserMedia error: ", error);
+    });
+}
+
+function call() {
+  callButton.disabled = true;
+  hangupButton.disabled = false;
+  trace("Starting call");
+
+  if (localStream.getVideoTracks().length > 0) {
+    trace('Using video device: ' + localStream.getVideoTracks()[0].label);
+  }
+  if (localStream.getAudioTracks().length > 0) {
+    trace('Using audio device: ' + localStream.getAudioTracks()[0].label);
+  }
+
+var servers = null;
+
+  localPeerConnection = new RTCPeerConnection(servers);
+  trace("Created local peer connection object localPeerConnection");
+  localPeerConnection.onicecandidate = gotLocalIceCandidate;
+
+  remotePeerConnection = new RTCPeerConnection(servers);
+  trace("Created remote peer connection object remotePeerConnection");
+  remotePeerConnection.onicecandidate = gotRemoteIceCandidate;
+  remotePeerConnection.onaddstream = gotRemoteStream;
+
+  localPeerConnection.addStream(localStream);
+  trace("Added localStream to localPeerConnection");
+  localPeerConnection.createOffer(gotLocalDescription,handleError);
+}
+
+function gotLocalDescription(description){
+  localPeerConnection.setLocalDescription(description);
+  trace("Offer from localPeerConnection: \n" + description.sdp);
+  remotePeerConnection.setRemoteDescription(description);
+  remotePeerConnection.createAnswer(gotRemoteDescription,handleError);
+}
+
+function gotRemoteDescription(description){
+  remotePeerConnection.setLocalDescription(description);
+  trace("Answer from remotePeerConnection: \n" + description.sdp);
+  localPeerConnection.setRemoteDescription(description);
+}
+
+function hangup() {
+  trace("Ending call");
+  localPeerConnection.close();
+  remotePeerConnection.close();
+  localPeerConnection = null;
+  remotePeerConnection = null;
+  hangupButton.disabled = true;
+  callButton.disabled = false;
+}
+
+function gotRemoteStream(event){
+  remoteVideo.src = URL.createObjectURL(event.stream);
+  trace("Received remote stream");
+}
+
+function gotLocalIceCandidate(event){
+  if (event.candidate) {
+    remotePeerConnection.addIceCandidate(new RTCIceCandidate(event.candidate));
+    trace("Local ICE candidate: \n" + event.candidate.candidate);
+  }
+}
+
+function gotRemoteIceCandidate(event){
+  if (event.candidate) {
+    localPeerConnection.addIceCandidate(new RTCIceCandidate(event.candidate));
+    trace("Remote ICE candidate: \n " + event.candidate.candidate);
+  }
+}
+
+function handleError(){}
+
+</script>
+
+<!-- video part finishes here -->
+
+<!--Add  buttons a user can click-->
+
+
+
+
+<div class= "movement">
+
+
+<!-- <button type="button" id="turn-up">Turn Up</button> -->
+<img src="img/up.png" id="turn-up">
+<img src="img/right.png" id="turn-right">
+<br>
+</br>
+
+<img src="img/left.png" id="turn-left">
+<img src="img/down.png" id="turn-down">
+
+<!-- 
+<button type="button" id="turn-right">Turn Right</button>
+<br>
+</br>
+<button type="button" id="turn-left">Turn Left</button>
+
+<button type="button" id="turn-down">Turn Down</button> -->
+
+</div>
+
+<!--Using JQuery for button events-->
+<script src="js/jquery-1.11.2.min.js"></script>
+<script type=text/javascript>
+  $(document).ready(function() {
+  });
+</script>
+<!--Socket.io library-->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  $(document).ready(function() {
+    // Connect to the node.js server. Change the IP address to the actual node server location.
+    var socket = io.connect('http://149.31.206.141:3000');
+    // When I've received 'robot connected' message from the socket.io server...
+    socket.on('robot connected', function (data) {
+      console.log(data);
+      // Send out a message to the server
+      socket.emit('robot command', { command: 'nothing' });
+    });
+
+    // When the html buttons are clicked...
+    $('#turn-left').mousemove(function() {
+      socket.emit('robot command', { command: "turn-left" });
+    });
+    $('#turn-right').mousemove(function() {
+      socket.emit('robot command', { command: "turn-right" });
+    });
+
+      $('#turn-up').mousemove(function() {
+      socket.emit('robot command', { command: "turn-up" });
+    });
+    $('#turn-down').mousemove(function() {
+      socket.emit('robot command', { command: "turn-down" });
+    });
+  });
+</script>
+</body>
